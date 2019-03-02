@@ -46,6 +46,7 @@ public class DozeSettingsFragment extends PreferenceFragment implements OnPrefer
         CompoundButton.OnCheckedChangeListener {
 
     private TextView mTextView;
+    private View mSwitchBar;
 
     private SwitchPreference mPickUpPreference;
     private SwitchPreference mHandwavePreference;
@@ -104,15 +105,16 @@ public class DozeSettingsFragment extends PreferenceFragment implements OnPrefer
         mTextView.setText(getString(dozeEnabled ?
                 R.string.switch_bar_on : R.string.switch_bar_off));
 
-        View switchBar = view.findViewById(R.id.switch_bar);
-        Switch switchWidget = (Switch) switchBar.findViewById(android.R.id.switch_widget);
+        mSwitchBar = view.findViewById(R.id.switch_bar);
+        Switch switchWidget = (Switch) mSwitchBar.findViewById(android.R.id.switch_widget);
         switchWidget.setChecked(dozeEnabled);
         switchWidget.setOnCheckedChangeListener(this);
-
+        mSwitchBar.setActivated(dozeEnabled);
         switchBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switchWidget.setChecked(!switchWidget.isChecked());
+                mSwitchBar.setActivated(switchWidget.isChecked());
             }
         });
     }
@@ -130,6 +132,7 @@ public class DozeSettingsFragment extends PreferenceFragment implements OnPrefer
         DozeUtils.checkDozeService(getActivity());
 
         mTextView.setText(getString(isChecked ? R.string.switch_bar_on : R.string.switch_bar_off));
+        mSwitchBar.setActivated(isChecked);
 
         mPickUpPreference.setEnabled(isChecked);
         mHandwavePreference.setEnabled(isChecked);
