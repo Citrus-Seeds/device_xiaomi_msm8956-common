@@ -31,11 +31,16 @@ on early-init
     symlink /data/tombstones /tombstones
 
 on fs
-    wait /dev/block/platform/soc.0/${ro.boot.bootdevice}
-    symlink /dev/block/platform/soc.0/${ro.boot.bootdevice} /dev/block/bootdevice
     mount_all /vendor/etc/fstab.qcom
 
 on init
+    wait /dev/block/platform/soc.0/${ro.boot.bootdevice}
+    symlink /dev/block/platform/soc.0/${ro.boot.bootdevice} /dev/block/bootdevice
+    
+    # Start qseecomd early as we mount system/ early
+    # vold needs keymaster which needs qseecomd
+    start qseecomd
+	
     write /sys/module/qpnp_rtc/parameters/poweron_alarm 1
 
 on post-fs-data
