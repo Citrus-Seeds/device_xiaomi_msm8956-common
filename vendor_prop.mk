@@ -96,6 +96,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.enable.sglscale=1 \
     debug.mdpcomp.logs=0 \
     debug.sf.hw=0 \
+    debug.sf.disable_backpressure=1 \
     dev.pm.dyn_samplingrate=1 \
     persist.demo.hdmirotationlock=false \
     persist.hwc.downscale_threshold=1.15 \
