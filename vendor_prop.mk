@@ -73,7 +73,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.data.iwlan.enable=true \
     persist.data.mode=concurrent \
     persist.data.netmgrd.qos.enable=true \
-    ro.use_data_netmgrd=true
+    ro.vendor.use_data_netmgrd=true
 
 # fling_velocity
 PRODUCT_PROPERTY_OVERRIDES += \

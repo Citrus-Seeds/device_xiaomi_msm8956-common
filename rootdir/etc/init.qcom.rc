@@ -308,8 +308,8 @@ on post-fs-data
     chmod 0770 /data/vendor/ipa
 
     # Create the directories used by CnE subsystem
-    mkdir /data/connectivity 0771 system system
-    chown system system /data/connectivity
+    mkdir /data/connectivity 0771 radio radio
+    chown radio radio /data/connectivity
 
     # Create directory used by audio subsystem
     mkdir /data/vendor/misc/audio 0770 audio audio
@@ -439,6 +439,9 @@ on post-fs-data
     #Create FTM_AP dir for factory test
     mkdir /data/FTM_AP 0775 system system
 
+    # Enable hvdcp
+    setprop persist.hvdcp.allow_opti 1
+
 service iop vendor/bin/iop
     class main
     user root
@@ -462,21 +465,21 @@ on property:sys.boot_completed=1
     write /sys/block/mmcblk0rpmb/queue/read_ahead_kb 128
 
 on property:vold.decrypt=trigger_restart_framework
-    start wcnss-service
+    start vendor.wcnss-service
     start config_bt_addr
 
-service cnd /vendor/bin/cnd
+service vendor.cnd /vendor/bin/cnd
     class main
     user system
     group system wifi inet radio wakelock net_admin
     writepid /dev/cpuset/system-background/tasks
 
-service irsc_util /vendor/bin/irsc_util "/vendor/etc/sec_config"
+service vendor.irsc_util /vendor/bin/irsc_util "/vendor/etc/sec_config"
     class core
     user root
     oneshot
 
-service rmt_storage /vendor/bin/rmt_storage
+service vendor.rmt_storage /vendor/bin/rmt_storage
     class core
     user root
     group system wakelock
@@ -484,7 +487,7 @@ service rmt_storage /vendor/bin/rmt_storage
     ioprio rt 0
     writepid /dev/cpuset/system-background/tasks
 
-service tftp_server /vendor/bin/tftp_server
+service vendor.tftp_server /vendor/bin/tftp_server
    class core
    user root
    writepid /dev/cpuset/system-background/tasks
@@ -534,20 +537,20 @@ on property:vendor.bluetooth.hciattach=false
     setprop vendor.bluetooth.status off
 
 # FM
-on property:hw.fm.init=0
+on property:vendor.hw.fm.init=0
     write /sys/module/radio_iris_transport/parameters/fmsmd_set 0
 
-on property:hw.fm.init=1
+on property:vendor.hw.fm.init=1
     write /sys/module/radio_iris_transport/parameters/fmsmd_set 1
 
 # QMUX must be in multiple groups to support external process connections
-service qmuxd /vendor/bin/qmuxd
+service vendor.qmuxd /vendor/bin/qmuxd
     class main
     user root
     group radio audio bluetooth gps nfc diag
     writepid /dev/cpuset/system-background/tasks
 
-service netmgrd /vendor/bin/netmgrd
+service vendor.netmgrd /vendor/bin/netmgrd
     class main
     group root wifi wakelock radio inet oem_2901
     writepid /dev/cpuset/system-background/tasks
@@ -558,19 +561,19 @@ service ipacm /vendor/bin/ipacm
     group radio inet
     writepid /dev/cpuset/system-background/tasks
 
-service qti /vendor/bin/qti
+service vendor.qti /vendor/bin/qti
     class main
     user radio
     group radio oem_2901 diag usb net_admin
     writepid /dev/cpuset/system-background/tasks
 
-service sensors /vendor/bin/sensors.qcom
+service vendor.sensors /vendor/bin/sensors.qcom
     class core
     user root
     group root
     writepid /dev/cpuset/system-background/tasks
 
-on property:ro.use_data_netmgrd=false
+on property:ro.vendor.use_data_netmgrd=false
     # netmgr not supported on specific target
     stop netmgrd
 
@@ -600,14 +603,15 @@ service loc_launcher /vendor/bin/loc_launcher
     #loc_launcher will start as root and set its uid to gps
     class late_start
     group gps inet diag wifi
+    writepid /dev/cpuset/system-background/tasks
 
-service qcom-sh /vendor/bin/init.qcom.sh
+service vendor.qcom-sh /vendor/bin/init.qcom.sh
     class late_start
     user root
     group root system radio
     oneshot
 
-service qcom-post-boot /vendor/bin/init.qcom.post_boot.sh
+service vendor.qcom-post-boot /vendor/bin/init.qcom.post_boot.sh
     class late_start
     user root
     group root system wakelock
@@ -615,7 +619,7 @@ service qcom-post-boot /vendor/bin/init.qcom.post_boot.sh
     oneshot
 
 on property:sys.boot_completed=1
-    start qcom-post-boot
+    start vendor.qcom-post-boot
     trigger enable-low-power
 
 on property:init.svc.recovery=running
@@ -625,7 +629,7 @@ on property:ro.data.large_tcp_window_size=true
     # Adjust socket buffer to enlarge TCP receive window for high bandwidth (e.g. DO-RevB)
     write /proc/sys/net/ipv4/tcp_adv_win_scale  2
 
-service ril-daemon2 /vendor/bin/hw/rild -c 2
+service vendor.ril-daemon2 /vendor/bin/hw/rild -c 2
     class main
     socket rild2 stream 660 root radio
     socket rild-debug2 stream 660 radio system
@@ -655,13 +659,13 @@ service vendor.msm_irqbal_lb /vendor/bin/msm_irqbalance -f /vendor/etc/msm_irqba
 on charger
     setprop persist.sys.usb.config mass_storage
     load_system_props
-    start qcom-post-boot
+    start vendor.qcom-post-boot
 
 on property:init.svc.surfaceflinger=restarting
     stop hwcomposer-2-1
     start hwcomposer-2-1
 
-service time_daemon /vendor/bin/time_daemon
+service vendor.time_daemon /vendor/bin/time_daemon
     class main
     user root
     group root
